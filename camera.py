@@ -26,6 +26,9 @@ class VideoCamera(object):
     def background_subtractor_gmg(self, image):
         return cv2.morphologyEx(self.fgbg_gmg.apply(image), cv2.MORPH_OPEN, self.fgbg_gmg_kernel)
 
+    def canny(self, image):
+        return cv2.Canny(image, 100, 200)
+
     def face_detection(self, image):
         # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = self.face_haar_cascade.detectMultiScale(image, 1.3, 5)
@@ -37,6 +40,7 @@ class VideoCamera(object):
                  'background_subtractor_mog2': background_subtractor_mog2,
                  'background_subtractor_gmg': background_subtractor_gmg,
                  'face_detection': face_detection,
+                 'canny': canny,
                  }
 
     def get_frame(self, filters=None):
