@@ -1,13 +1,40 @@
-{% extends "layout.html" %}
-{% block content %}
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Video Streaming Demonstration</title>
-  </head>
-  <body>
-    <h1>Video Streaming Demonstration</h1>
+<head>
+  <meta charset="UTF-8">
+  <title>OpenCV Camera</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
-    <img id="bg" src="{{ url_for('video_feed') }}">
-  </body>
+<body>
+<div class="demo">
+  <div class="demo__title">OpenCV Camera</div>
+  <div class="demo__content">
+    <label class="switcher">
+      <input type="checkbox" name="choice" value="choice1"/>
+      <div class="switcher__indicator"></div><span>Edge detection</span>
+    </label><br/><br/>
+    <label class="switcher">
+      <input type="checkbox" name="choice" value="choice2"/>
+      <div class="switcher__indicator"></div><span>Movement detection</span>
+    </label><br/><br/>
+    <label class="switcher">
+      <input type="checkbox" name="choice" value="choice3"/>
+      <div class="switcher__indicator"></div><span>Sobel filter</span>
+    </label><br/><br/>
+    <label class="switcher">
+      <input type="checkbox" name="choice" value="choice4"/>
+      <div class="switcher__indicator"></div><span>Blur filter</span>
+    </label><br/><br/>
+  </div>
+  <div class="button__title">
+    <input type="button" class="button" id="btnSearch" value="RUN">
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="{{ url_for('static', filename='hello.js') }}"></script>
+
+</body>
 </html>
-{% endblock content %}
