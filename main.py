@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import threading
+from threading import Thread
 import time
 
 from flask import Flask, render_template, Response
@@ -18,9 +18,24 @@ video_camera = VideoCamera()
 last_epoch = 0
 
 
-def check_for_objects():
-    global last_epoch
-    while True:
+class Mailing(Thread):
+
+    def __init__(self):
+        super().__init__()
+        self.daemon = True
+        self.running = False
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        self.running = True
+        while self.running:
+            self.check_for_objects()
+
+    @staticmethod
+    def check_for_objects():
+        global last_epoch
         try:
             frame, found_obj = video_camera.get_object()
             if found_obj and (time.time() - last_epoch) > email_update_interval:
@@ -52,7 +67,6 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    # t = threading.Thread(target=check_for_objects, args=())
-    # t.daemon = True
-    # t.start()
+    # mailing = Mailing()
+    # mailing.start()
     app.run(host='0.0.0.0', debug=True)
