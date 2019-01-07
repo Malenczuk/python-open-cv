@@ -38,11 +38,11 @@ class VideoCamera:
             cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
         return image
 
-    functions = {'background_subtractor_mog': background_subtractor_mog,
-                 'background_subtractor_mog2': background_subtractor_mog2,
-                 'background_subtractor_gmg': background_subtractor_gmg,
-                 'face_detection': face_detection,
-                 'canny': canny,
+    functions = {'Background Subtractor MOG': background_subtractor_mog,
+                 'Background Subtractor MOG2': background_subtractor_mog2,
+                 'Background Subtractor GMG': background_subtractor_gmg,
+                 'Face Detection': face_detection,
+                 'Canny': canny,
                  }
 
     def get_frame(self, flip=False):
@@ -73,7 +73,7 @@ class VideoCamera:
 
         if len(objects) > 0:
             found_objects = True
-        
+
         # Draw a rectangle around the objects
         for (x, y, w, h) in objects:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
