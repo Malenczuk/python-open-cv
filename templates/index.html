@@ -11,22 +11,28 @@
 <div class="demo">
   <div class="demo__title">OpenCV Camera</div>
   <div class="demo__content">
-    <label class="switcher">
-      <input type="checkbox" name="choice" value="choice1"/>
-      <div class="switcher__indicator"></div><span>Edge detection</span>
-    </label><br/><br/>
-    <label class="switcher">
-      <input type="checkbox" name="choice" value="choice2"/>
-      <div class="switcher__indicator"></div><span>Movement detection</span>
-    </label><br/><br/>
-    <label class="switcher">
-      <input type="checkbox" name="choice" value="choice3"/>
-      <div class="switcher__indicator"></div><span>Sobel filter</span>
-    </label><br/><br/>
-    <label class="switcher">
-      <input type="checkbox" name="choice" value="choice4"/>
-      <div class="switcher__indicator"></div><span>Blur filter</span>
-    </label><br/><br/>
+      {% for key in Filters %}
+          <label class="switcher">
+          <input type="checkbox" name="choice" value="{{ key }}"/>
+          <div class="switcher__indicator"></div><span>{{ key }}</span>
+          </label><br/><br/>
+      {% endfor %}
+{#    <label class="switcher">#}
+{#      <input type="checkbox" name="choice" value="choice1"/>#}
+{#      <div class="switcher__indicator"></div><span>Edge detection</span>#}
+{#    </label><br/><br/>#}
+{#    <label class="switcher">#}
+{#      <input type="checkbox" name="choice" value="choice2"/>#}
+{#      <div class="switcher__indicator"></div><span>Movement detection</span>#}
+{#    </label><br/><br/>#}
+{#    <label class="switcher">#}
+{#      <input type="checkbox" name="choice" value="choice3"/>#}
+{#      <div class="switcher__indicator"></div><span>Sobel filter</span>#}
+{#    </label><br/><br/>#}
+{#    <label class="switcher">#}
+{#      <input type="checkbox" name="choice" value="choice4"/>#}
+{#      <div class="switcher__indicator"></div><span>Blur filter</span>#}
+{#    </label><br/><br/>#}
   </div>
   <div class="button__title">
     <input type="button" class="button" id="btnSearch" value="RUN">

@@ -2,13 +2,13 @@ import cv2
 from functools import reduce
 import numpy as np
 
-_PATH = 'haarcascade_frontalface_default.xml'
+_PATH = 'haarcascades/haarcascade_frontalface_default.xml'
 
 
 class VideoCamera:
 
     def __init__(self):
-        self.video = cv2.VideoCapture("chaplin.mp4")
+        self.video = cv2.VideoCapture(0)
         self.frame_counter = 0
         self.face_haar_cascade = cv2.CascadeClassifier(_PATH)
         self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
@@ -47,12 +47,15 @@ class VideoCamera:
 
     def get_frame(self, flip=False):
         success, frame = self.video.read()
+        # if not success:
+        #     self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        #     success, frame = self.video.read()
         return frame if not flip else np.flip(frame, 0)
 
     def get_image(self, filters=None):
-        frame = self.get_frame()
+        frame = self.get_frame().copy()
         image = reduce(lambda img, fun: self.functions.get(fun, lambda x, y: y)(self, img), [frame] + filters)
-        ret, jpeg = cv2.imencode('.jpg', image)
+        _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
     def get_object(self):
@@ -70,10 +73,10 @@ class VideoCamera:
 
         if len(objects) > 0:
             found_objects = True
-
+        
         # Draw a rectangle around the objects
         for (x, y, w, h) in objects:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        ret, jpeg = cv2.imencode('.jpg', frame)
+        _, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes(), found_objects

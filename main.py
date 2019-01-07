@@ -16,6 +16,7 @@ basic_auth = BasicAuth(app)
 email_update_interval = 600
 video_camera = VideoCamera()
 last_epoch = 0
+filters = []
 
 
 class Mailing(Thread):
@@ -50,18 +51,22 @@ class Mailing(Thread):
 @app.route('/')
 @basic_auth.required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', Filters=video_camera.functions.keys())
+
 
 @app.route('/camera.html')
 def index_camera():
-    print(request.args)
+    global filters
+    filters = request.args.getlist("choice")
     return render_template('camera.html')
+
 
 def gen(camera):
     while True:
-        frame = camera.get_image(filters=['background_subtractor_mog2'])
+        frame = camera.get_image(filters=filters)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 
 @app.route('/video_feed')
 def video_feed():
