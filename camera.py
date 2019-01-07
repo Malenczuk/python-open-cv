@@ -8,12 +8,11 @@ _PATH = 'haarcascades/haarcascade_frontalface_default.xml'
 class VideoCamera:
 
     def __init__(self):
-        self.video = cv2.VideoCapture("chaplin.mp4")
-        self.frame_counter = 0
+        self.video = cv2.VideoCapture(0)
         self.face_haar_cascade = cv2.CascadeClassifier(_PATH)
-        # self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
+        self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.fgbg_mog2 = cv2.createBackgroundSubtractorMOG2()
-        # self.fgbg_gmg = cv2.bgsegm.createBackgroundSubtractorGMG()
+        self.fgbg_gmg = cv2.bgsegm.createBackgroundSubtractorGMG()
         self.fgbg_gmg_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
 
     def __del__(self):
@@ -47,9 +46,9 @@ class VideoCamera:
 
     def get_frame(self, flip=False):
         success, frame = self.video.read()
-        if not success:
-            self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            success, frame = self.video.read()
+        # if not success:
+        #     self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        #     success, frame = self.video.read()
         return frame if not flip else np.flip(frame, 0)
 
     def get_image(self, filters=None):
