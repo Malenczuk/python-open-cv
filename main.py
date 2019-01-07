@@ -2,10 +2,10 @@
 from threading import Thread
 import time
 
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, redirect
 from flask_basicauth import BasicAuth
 from camera import VideoCamera
-from mail import send_email
+from mail import *
 
 app = Flask(__name__)
 app.config['BASIC_AUTH_USERNAME'] = 'student'
@@ -52,6 +52,22 @@ class Mailing(Thread):
 @basic_auth.required
 def index():
     return render_template('index.html', Filters=video_camera.functions.keys())
+
+
+@app.route('/mail/settings')
+def mail_settings():
+    return render_template('mailForm.html')
+
+
+@app.route('/mail/settings/credentials', methods=['POST'])
+def set_mail_credentials():
+    global fromEmail
+    global fromEmailPassword
+    global toEmail
+    fromEmail = request.form['fromEmail']
+    fromEmailPassword = request.form['fromEmail']
+    toEmail = request.form['fromEmail']
+    return redirect('/')
 
 
 @app.route('/camera.html')

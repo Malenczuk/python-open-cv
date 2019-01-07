@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="demo">
+    <div class="demo__title">Email Settings</div>
+    <div class="demo__content">
+        <form action="{{ url_for('set_mail_credentials') }}" method="post">
+            <div><label for="field1">
+                <input type="email" class="input-field"name="fromEmail" value="" required/>
+                <span>SendFrom Email (Only gmail) <span class="required">*</span></span>
+            </label></div>
+            <div><label for="field2">
+                <input type="password" class="input-field" name="fromEmailPassword" value="" required/>
+                <span>SendFrom Email Password <span class="required">*</span></span>
+            </label></div>
+            <div><label for="field2">
+                <input type="email" class="input-field" name="toEmail" value="" required/>
+                <span>SendTo Email <span class="required">*</span></span>
+            </label></div>
+            <label><span> </span><input type="submit" value="Submit"/></label>
+        </form>
+    </div>
+</div>
+</body>
+</html>
