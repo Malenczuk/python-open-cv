@@ -41,7 +41,6 @@ class Security(Thread):
                         self.start_recording(datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S.avi'))
                 elif self.recording and (time.time() - last_found) > self.record_time_after_found:
                     self.stop_recording()
-                print("still recording for {}s".format(self.record_time_after_found - time.time() + last_found))
 
                 if self.recording:
                     self.record_frame(frame)
