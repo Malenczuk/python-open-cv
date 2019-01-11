@@ -8,8 +8,6 @@ class VideoCamera:
 
     def __init__(self):
         self.video = cv2.VideoCapture(0)
-        self.width = self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.height = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.face_haar_cascade = cv2.CascadeClassifier(_PATH)
         # self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.fgbg_mog2 = cv2.createBackgroundSubtractorMOG2()
@@ -45,8 +43,15 @@ class VideoCamera:
         return sobely
 
     def face_detection(self, image):
-        # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = self.face_haar_cascade.detectMultiScale(image, 1.3, 5)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        faces = self.face_haar_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
         return image
@@ -63,9 +68,10 @@ class VideoCamera:
 
     def get_frame(self, flip=False):
         success, frame = self.video.read()
-        if not success:
-            self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            success, frame = self.video.read()
+        # if not success:
+        #     self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        #     success, frame = self.video.read()
+
         return frame if not flip else np.flip(frame, 0)
 
     def get_image(self, filter=None, flip=False):
@@ -77,12 +83,12 @@ class VideoCamera:
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
-    def get_object(self, flip=False):
+    def get_object(self, classifier, flip=False):
         found_objects = False
         frame = self.get_frame(flip).copy()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        objects = self.face_haar_cascade.detectMultiScale(
+        objects = classifier.detectMultiScale(
             gray,
             scaleFactor=1.1,
             minNeighbors=5,
@@ -98,4 +104,4 @@ class VideoCamera:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         _, jpeg = cv2.imencode('.jpg', frame)
-        return jpeg.tobytes(), found_objects
+        return frame, jpeg.tobytes(), found_objects

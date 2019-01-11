@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-from threading import Thread
-import time
-
 from flask import Flask, render_template, Response, request, redirect
 from flask_basicauth import BasicAuth
 from camera import VideoCamera
-from mail import *
+from security import Security
+
 
 app = Flask(__name__)
 app.config['BASIC_AUTH_USERNAME'] = 'student'
@@ -13,39 +11,9 @@ app.config['BASIC_AUTH_PASSWORD'] = 'student'
 app.config['BASIC_AUTH_FORCE'] = True
 basic_auth = BasicAuth(app)
 
-email_update_interval = 600
+
 video_camera = VideoCamera()
-last_epoch = 0
 selected_filter = None
-
-
-class Mailing(Thread):
-
-    def __init__(self):
-        super().__init__()
-        self.daemon = True
-        self.running = False
-
-    def stop(self):
-        self.running = False
-
-    def run(self):
-        self.running = True
-        while self.running:
-            self.check_for_objects()
-
-    @staticmethod
-    def check_for_objects():
-        global last_epoch
-        try:
-            frame, found_obj = video_camera.get_object()
-            if found_obj and (time.time() - last_epoch) > email_update_interval:
-                last_epoch = time.time()
-                print("Sending email...")
-                send_email(frame)
-                print("done!")
-        except Exception as e:
-            print("Error sending email: ", str(e))
 
 
 @app.route('/')
@@ -91,6 +59,6 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    # mailing = Mailing()
-    # mailing.start()
+    security = Security(video_camera, 'haarcascades/haarcascade_upperbody.xml')
+    security.start()
     app.run(host='0.0.0.0', debug=False)
