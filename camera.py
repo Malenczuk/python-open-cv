@@ -1,5 +1,4 @@
 import cv2
-from functools import reduce
 import numpy as np
 
 _PATH = 'haarcascades/haarcascade_frontalface_default.xml'
@@ -9,10 +8,12 @@ class VideoCamera:
 
     def __init__(self):
         self.video = cv2.VideoCapture(0)
+        self.width = self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.height = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.face_haar_cascade = cv2.CascadeClassifier(_PATH)
-        self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
+        # self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.fgbg_mog2 = cv2.createBackgroundSubtractorMOG2()
-        self.fgbg_gmg = cv2.bgsegm.createBackgroundSubtractorGMG()
+        # self.fgbg_gmg = cv2.bgsegm.createBackgroundSubtractorGMG()
         self.fgbg_gmg_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
 
     def __del__(self):
@@ -28,7 +29,20 @@ class VideoCamera:
         return cv2.morphologyEx(self.fgbg_gmg.apply(image), cv2.MORPH_OPEN, self.fgbg_gmg_kernel)
 
     def canny(self, image):
-        return cv2.Canny(image, 100, 200)
+        return cv2.cvtColor(cv2.Canny(image, 100, 200), cv2.COLOR_GRAY2RGB)
+
+    def laplacian(self, image):
+        return cv2.Laplacian(image, cv2.CV_64F)
+
+    def sobelx(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
+        return sobelx
+
+    def sobely(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
+        return sobely
 
     def face_detection(self, image):
         # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -42,24 +56,30 @@ class VideoCamera:
                  'Background Subtractor GMG': background_subtractor_gmg,
                  'Face Detection': face_detection,
                  'Canny': canny,
+                 'Laplacian': laplacian,
+                 'Sobel X': sobelx,
+                 'Sobel Y': sobely,
                  }
 
     def get_frame(self, flip=False):
         success, frame = self.video.read()
-        # if not success:
-        #     self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
-        #     success, frame = self.video.read()
+        if not success:
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            success, frame = self.video.read()
         return frame if not flip else np.flip(frame, 0)
 
-    def get_image(self, filters=None):
-        frame = self.get_frame().copy()
-        image = reduce(lambda img, fun: self.functions.get(fun, lambda x, y: y)(self, img), [frame] + filters)
+    def get_image(self, filter=None, flip=False):
+        frame = self.get_frame(flip).copy()
+        if filter is None:
+            return frame.tobytes()
+        image = self.functions.get(filter, lambda x, y: y)(self, frame)
+        # image = np.hstack((frame, image))
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
-    def get_object(self):
+    def get_object(self, flip=False):
         found_objects = False
-        frame = self.get_frame().copy()
+        frame = self.get_frame(flip).copy()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         objects = self.face_haar_cascade.detectMultiScale(
