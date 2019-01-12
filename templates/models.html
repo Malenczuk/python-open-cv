@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>OpenCV Camera</title>
@@ -9,18 +9,18 @@
 
 <body>
 <div class="demo">
-    <div class="demo__title">OpenCV Camera</div>
+    <div class="demo__title">Model Settings</div>
     <div class="demo__content">
-        {% for key in Filters %}
+        {% for key in Models %}
             <label class="switcher">
-                <input type="radio" name="filter" value="{{ key }}"/>
+                <input type="radio" name="model" value="{{ key }}"/>
                 <div class="switcher__indicator"></div>
                 {{ key }}
             </label><br/><br/>
         {% endfor %}
     </div>
     <div class="button__title">
-        <input type="button" class="button" id="btnSearch" value="RUN">
+        <input type="button" class="button" id="btnModel" value="Select Model">
     </div>
 </div>
 

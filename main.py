@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, Response, request, redirect
+from flask import Flask, render_template, Response, request, redirect, url_for
 from flask_basicauth import BasicAuth
 from camera import VideoCamera
 from security import Security
+import mail
 
 
 app = Flask(__name__)
@@ -14,6 +15,7 @@ basic_auth = BasicAuth(app)
 
 video_camera = VideoCamera()
 selected_filter = None
+selected_model = None
 
 
 @app.route('/')
@@ -22,26 +24,30 @@ def index():
     return render_template('index.html', Filters=video_camera.functions.keys())
 
 
-@app.route('/mail/settings')
+@app.route('/models')
+def model_settings():
+    return render_template('models.html', Models=video_camera.models.keys())
+
+
+@app.route('/settings/mail', methods=['GET', 'POST'])
 def mail_settings():
-    return render_template('mailForm.html')
+    if request.method == "POST":
+        mail.fromEmail = request.form['fromEmail']
+        mail.fromEmailPassword = request.form['fromEmail']
+        mail.toEmail = request.form['fromEmail']
+        return "Settings changed"
+    return render_template('mailForm.html', fromEmail=mail.fromEmail, toEmail=mail.toEmail)
 
 
-@app.route('/mail/settings/credentials', methods=['POST'])
-def set_mail_credentials():
-    global fromEmail
-    global fromEmailPassword
-    global toEmail
-    fromEmail = request.form['fromEmail']
-    fromEmailPassword = request.form['fromEmail']
-    toEmail = request.form['fromEmail']
-    return redirect('/')
-
-
-@app.route('/camera.html')
+@app.route('/camera')
 def index_camera():
-    global selected_filter
-    selected_filter = request.args.get("choice")
+    global selected_filter, selected_model
+    selected_filter = request.args.get("filter")
+    selected_model = request.args.get("model")
+    if selected_filter:
+        if "Harr Cascades" in selected_filter and selected_model not in video_camera.models.keys():
+            return redirect('/models')
+    video_camera.set_model(selected_model)
     return render_template('camera.html')
 
 
@@ -59,6 +65,7 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    security = Security(video_camera, 'haarcascades/haarcascade_upperbody.xml')
-    security.start()
+    security = Security(video_camera)
+    security.set_classifier('frontalface_default')
+    # security.start()
     app.run(host='0.0.0.0', debug=False)

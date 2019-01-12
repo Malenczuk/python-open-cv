@@ -4,11 +4,11 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
 # Email you want to send the update from (only works with gmail)
-fromEmail = ''
-fromEmailPassword = ''
+fromEmail = 'systemwbudowany@gmail.com'
+fromEmailPassword = 'Student@1234'
 
 # Email you want to send the update to
-toEmail = ''
+toEmail = 'systemwbudowany@gmail.com'
 
 
 def send_email(image):

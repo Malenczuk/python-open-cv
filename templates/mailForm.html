@@ -10,7 +10,10 @@
 <div class="demo">
     <div class="demo__title">Email Settings</div>
     <div class="demo__content">
-        <form action="{{ url_for('set_mail_credentials') }}" method="post">
+            <span>Current Setting</span><br>
+            <span>SendFrom Email = {{ fromEmail }}</span><br>
+            <span>SendTo Email   = {{ toEmail }}</span><br>
+        <form method="POST">
             <div><label for="field1">
                 <input type="email" class="input-field"name="fromEmail" value="" required/>
                 <span>SendFrom Email (Only gmail) <span class="required">*</span></span>
@@ -22,8 +25,8 @@
             <div><label for="field2">
                 <input type="email" class="input-field" name="toEmail" value="" required/>
                 <span>SendTo Email <span class="required">*</span></span>
-            </label></div>
-            <label><span> </span><input type="submit" value="Submit"/></label>
+            </label></div>z
+            <label><span> </span><input type="submit" value="Save"/></label>
         </form>
     </div>
 </div>

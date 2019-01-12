@@ -1,14 +1,25 @@
+import glob
+import os
+
 import cv2
 import numpy as np
 
-_PATH = 'haarcascades/haarcascade_frontalface_default.xml'
+
+def get_models():
+    cur_path = os.curdir
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    files = glob.glob("haarcascades/*.xml")
+    models = [f[25:-4] for f in files]
+    os.chdir(cur_path)
+    return dict(zip(models, files))
 
 
 class VideoCamera:
 
     def __init__(self):
         self.video = cv2.VideoCapture(0)
-        self.face_haar_cascade = cv2.CascadeClassifier(_PATH)
+        self.models = get_models()
+        self.haar_cascade = None
         # self.fgbg_mog = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.fgbg_mog2 = cv2.createBackgroundSubtractorMOG2()
         # self.fgbg_gmg = cv2.bgsegm.createBackgroundSubtractorGMG()
@@ -16,6 +27,13 @@ class VideoCamera:
 
     def __del__(self):
         self.video.release()
+
+    def set_model(self, name):
+        if name in self.models.keys():
+            self.haar_cascade = cv2.CascadeClassifier(self.models.get(name))
+
+    def none(self, frame):
+        return frame
 
     def background_subtractor_mog(self, image):
         return self.fgbg_mog.apply(image)
@@ -42,28 +60,30 @@ class VideoCamera:
         sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
         return sobely
 
-    def face_detection(self, image):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    def harr_cascades(self, image):
+        if self.haar_cascade:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        faces = self.face_haar_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-        for (x, y, w, h) in faces:
-            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            faces = self.haar_cascade.detectMultiScale(
+                gray,
+                scaleFactor=1.1,
+                minNeighbors=5,
+                minSize=(30, 30),
+                flags=cv2.CASCADE_SCALE_IMAGE
+            )
+            for (x, y, w, h) in faces:
+                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
         return image
 
     functions = {'Background Subtractor MOG': background_subtractor_mog,
                  'Background Subtractor MOG2': background_subtractor_mog2,
                  'Background Subtractor GMG': background_subtractor_gmg,
-                 'Face Detection': face_detection,
+                 'Harr Cascades': harr_cascades,
                  'Canny': canny,
                  'Laplacian': laplacian,
                  'Sobel X': sobelx,
                  'Sobel Y': sobely,
+                 'None': none
                  }
 
     def get_frame(self, flip=False):
@@ -76,8 +96,6 @@ class VideoCamera:
 
     def get_image(self, filter=None, flip=False):
         frame = self.get_frame(flip).copy()
-        if filter is None:
-            return frame.tobytes()
         image = self.functions.get(filter, lambda x, y: y)(self, frame)
         # image = np.hstack((frame, image))
         _, jpeg = cv2.imencode('.jpg', image)

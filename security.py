@@ -7,10 +7,10 @@ import cv2
 
 class Security(Thread):
 
-    def __init__(self, video, classifier):
+    def __init__(self, video):
         super().__init__()
         self.video = video
-        self.classifier = cv2.CascadeClassifier(classifier)
+        self.classifier = None
         self.flip = False
 
         self.save_video = True
@@ -22,6 +22,10 @@ class Security(Thread):
         self.email_update_interval = 600.0
 
         self.running = False
+
+    def set_classifier(self, name):
+        if name in self.video.models.keys():
+            self.classifier = cv2.CascadeClassifier(self.video.models.get(name))
 
     def stop(self):
         self.running = False
@@ -48,7 +52,7 @@ class Security(Thread):
             if self.email_update:
                 if found_obj and (time.time() - last_epoch) > self.email_update_interval:
                     last_epoch = time.time()
-                    self.send_mail(jpeg)
+                    Thread(target=Security.send_mail, args=(jpeg,)).start()
 
     def change_classifier(self, classifier):
         self.classifier = cv2.CascadeClassifier(classifier)
@@ -63,12 +67,13 @@ class Security(Thread):
         print("Started recording to {} at {} frames with {} resolution".format(file, frames, size))
 
     def stop_recording(self):
-        if self.recording and self.out:
+        if self.recording:
             self.recording = False
             self.out.release()
             print("Stopped recording")
 
-    def send_mail(self, frame):
+    @staticmethod
+    def send_mail(frame):
         try:
             print("Sending email...")
             send_email(frame)
