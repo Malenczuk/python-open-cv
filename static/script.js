@@ -14,5 +14,15 @@ $(document).ready(function () {
             url = url + "model=" + selected.value;
         window.location = url;
     });
+
+    $("#btnModels").click(function () {
+        let url = "models";
+        window.location = url;
+    });
+
+    $("#btnMailSettings").click(function () {
+        let url = "settings/mail";
+        window.location = url;
+    });
 });
 

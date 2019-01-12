@@ -34,6 +34,10 @@ body {
     padding-bottom: 10px;
 }
 
+.global_demo {
+    vertical-align: middle;
+}
+
 .demo {
     display: inline-block;
     padding: 50px;
